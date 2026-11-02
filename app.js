@@ -255,7 +255,7 @@ function buildPNav(){const items=[['Home','home'],['Work','works'],['Certificate
 /* ---------- effects ---------- */
 let io=null;
 function countUp(el){const to=+el.dataset.count,suf=el.dataset.suffix||'';const t0=performance.now();(function s(n){const t=Math.min(1,(n-t0)/1400),e=1-Math.pow(1-t,3);el.textContent=Math.round(to*e).toLocaleString()+suf;if(t<1)requestAnimationFrame(s)})(t0)}
-function initReveals(){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');if(e.target.dataset.count!==undefined)countUp(e.target);io.unobserve(e.target)}),{threshold:.12,rootMargin:'0px 0px -6% 0px'});$$('.rv,.rv-l,.rv-w,[data-count]').forEach(el=>io.observe(el))}
+function initReveals(){io&&io.disconnect();io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');if(e.target.dataset.count!==undefined)countUp(e.target);io.unobserve(e.target)}),{threshold:.01,rootMargin:'0px 0px -4% 0px'});$$('.rv,.rv-l,.rv-w,[data-count]').forEach(el=>io.observe(el));setTimeout(()=>$$('.rv:not(.in),.rv-l:not(.in),.rv-w:not(.in)').forEach(e=>e.classList.add('in')),5000)}
 function railProgress(r){const bar=r.parentElement.querySelector('.rprog i');if(!bar)return;const max=r.scrollWidth-r.clientWidth;const vis=r.clientWidth/r.scrollWidth;bar.style.width=Math.max(12,Math.min(100,vis*100))+'%';bar.style.marginLeft=(max>0?(r.scrollLeft/max)*(100-parseFloat(bar.style.width)):0)+'%'}
 function initRail(r){if(!r)return;let down=false,sx=0,sl=0,moved=0;railProgress(r);r.addEventListener('scroll',()=>railProgress(r),{passive:true});
  r.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||r.classList.contains('grid'))return;down=true;moved=0;sx=e.clientX;sl=r.scrollLeft});
@@ -268,7 +268,7 @@ function initRail(r){if(!r)return;let down=false,sx=0,sl=0,moved=0;railProgress(
 function initLiquid(frame){
  const img=$('.ph-base',frame),cv=$('.ph-cv',frame);if(!img||!cv||matchMedia('(prefers-reduced-motion: reduce)').matches)return()=>{};
  const ctx=cv.getContext('2d'),cover=document.createElement('canvas'),brush=document.createElement('canvas'),bctx=brush.getContext('2d'),cctx=cover.getContext('2d');
- const decay=.016;let dpr=Math.min(devicePixelRatio||1,2),W=0,H=0,radius=0,points=[],last=null,idle=0,raf=0,visible=true,t=0;
+ const decay=.016;let dpr=matchMedia('(hover: none)').matches?1:Math.min(devicePixelRatio||1,2),W=0,H=0,radius=0,points=[],last=null,idle=0,raf=0,visible=true,t=0,skip=0;
  const auto=matchMedia('(hover: none)').matches,src=new Image();let loaded=false;
  function layout(){const r=frame.getBoundingClientRect();if(!r.width)return;W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);cover.width=W;cover.height=H;
   const brushR=120*(parseFloat(getComputedStyle(document.documentElement).fontSize)/16);radius=brushR*dpr;brush.width=brush.height=Math.ceil(radius*2);
@@ -278,7 +278,7 @@ function initLiquid(frame){
   bctx.globalCompositeOperation='source-in';bctx.drawImage(cover,x-c,y-c,d,d,0,0,d,d);ctx.globalCompositeOperation='source-over';ctx.drawImage(brush,x-c,y-c)}
  function add(x,y){if(last){const dx=x-last.x,dy=y-last.y,dist=Math.hypot(dx,dy),step=Math.max(radius*.3,1),n=Math.min(Math.ceil(dist/step),60);for(let i=1;i<=n;i++)points.push({x:last.x+dx*i/n,y:last.y+dy*i/n})}else points.push({x,y});last={x,y};start()}
  function tick(){raf=0;if(!visible||!loaded)return start(true);
-  if(auto&&!points.length){t+=.014;add(W/2+Math.sin(t*1.3)*W*.3,H/2+Math.sin(t*.9+1)*H*.3)}
+  if(auto&&!points.length){if((skip=(skip+1)%2)){raf=requestAnimationFrame(tick);return}t+=.028;add(W/2+Math.sin(t*1.3)*W*.3,H/2+Math.sin(t*.9+1)*H*.3)}
   const drawing=points.length>0;if(drawing)idle=0;else{idle++;if(idle>120&&!auto)return}
   const fade=drawing?decay:Math.min(decay+idle*.004,.5);ctx.globalCompositeOperation='destination-out';ctx.fillStyle=`rgba(0,0,0,${fade})`;ctx.fillRect(0,0,W,H);
   if(drawing){points.forEach(p=>stamp(p.x,p.y));points=[]}if(idle>=120)ctx.clearRect(0,0,W,H);raf=requestAnimationFrame(tick)}
