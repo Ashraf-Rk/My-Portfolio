@@ -448,3 +448,13 @@ body.ready .wm{opacity:1;transform:none}
 .note.warn{background:#fff6e5}
 .pbar{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.rv,.ln>span,.wd{opacity:1!important;transform:none!important}}
+
+/* phones & touch: lighter rendering so it stays smooth */
+@media (hover:none),(max-width:640px){
+ .hero-bg i{animation:none;filter:blur(40px)}
+ .hero::after{display:none}
+ .chip,.hcard,.glassbox,#hdr.glass,.m-bg,.ph-hint{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ #hdr.glass{background:rgba(251,252,251,.96)}
+ .marq-t{animation-duration:48s}
+ .rv{transition-duration:.55s}
+}
